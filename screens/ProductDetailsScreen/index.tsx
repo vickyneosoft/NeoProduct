@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 import { StyleSheet, View, Image } from 'react-native'
+import FastImage from 'react-native-fast-image'
 
 // Components
 import BoldText from '../../components/BoldText'
@@ -20,6 +21,7 @@ import { useGetProductDetailsByIdQuery } from '../../services/products'
 
 // Misc
 import { height, width } from '../../utils/miscUtils'
+import FlatListSlider from '../../components/FlatListSlider'
 
 const ProductDetailsScreen = (props: any) => {
     const { route } = props
@@ -41,6 +43,7 @@ const ProductDetailsScreen = (props: any) => {
     const productImg = useMemo(() => ({ uri: data?.data?.product_images?.[0]?.image }), [data])
 
     if (error || isError) {
+        console.log('[ProductDetailsScreen] Error : ', error)
         return <ErrorComponent />
     }
 
@@ -50,10 +53,24 @@ const ProductDetailsScreen = (props: any) => {
 
     return (
         <View style={styles.container}>
-            <Image
+            {/* <Image
                 source={productImg}
                 style={styles.productImg}
                 resizeMode="stretch"
+            /> */}
+            <FlatListSlider
+                data={data?.data?.product_images}
+                timer={2000}
+                imageKey={'image'}
+                local={false}
+                width={width}
+                separator={0}
+                loop={false}
+                autoscroll={false}
+                currentIndexCallback={index => console.log('Index', index)}
+                onPress={item => alert(JSON.stringify(item))}
+                indicator
+            // animation
             />
             <View style={styles.descriptionContainer}>
                 <View style={styles.basicDetailsContainer}>
