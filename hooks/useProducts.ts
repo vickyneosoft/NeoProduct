@@ -30,11 +30,11 @@ function useProducts() {
     }, [apiData])
 
     const onEndReachedHandler = useCallback(() => {
-        if (endReached) {
+        if (endReached || isFetching || isLoading) {
             return
         }
         setPage(prevState => prevState + 1)
-    }, [endReached])
+    }, [endReached, isFetching, isLoading])
 
     const refresh = useCallback(() => {
         setData([])
@@ -44,7 +44,6 @@ function useProducts() {
     return {
         data,
         error,
-        endReached,
         isFetching,
         isLoading,
         endReached,

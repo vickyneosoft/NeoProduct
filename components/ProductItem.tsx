@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { View, Image, Pressable, StyleSheet, ImageURISource } from 'react-native'
 
 // Constants
@@ -10,16 +10,19 @@ import RegularText from './RegularText'
 
 // Types
 import { Product } from '../types'
+import ToggleButton from './ToggleButton'
 
 type ProductItemProps = {
+    isFavorite: boolean
     item: Product<string>
-    onPress: () => any
+    onPress: () => void
+    onToggleFav: () => void
 }
 
 function ProductItem(props: ProductItemProps) {
-    const { item, onPress } = props
+    const { isFavorite, item, onPress, onToggleFav } = props
 
-    const productImg = React.useMemo((): ImageURISource | undefined => {
+    const productImg = useMemo((): ImageURISource | undefined => {
         return { uri: item.product_images }
     }, [item])
 
@@ -30,13 +33,21 @@ function ProductItem(props: ProductItemProps) {
                 style={styles.itemImg}
                 resizeMode="contain"
             />
-            <View style={styles.contentContainer}>
-                <BoldText>{item.name}</BoldText>
-                <RegularText>{item.producer}</RegularText>
-                <BoldText style={styles.itemPrice}>
-                    {`Rs. ${item.cost}`}
-                </BoldText>
-            </View>
+            <View style={styles.textAndFavBtnContainer}>
+                <View style={styles.textContainer}>
+                    <BoldText>{item.name}</BoldText>
+                    <RegularText>{item.producer}</RegularText>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <BoldText style={styles.itemPrice}>
+                            {`Rs. ${item.cost}`}
+                        </BoldText>
+                        <ToggleButton
+                            isActive={isFavorite}
+                            onToggle={onToggleFav}
+                        />
+                    </View>
+                </View>
+            </View >
         </Pressable>
     )
 }
@@ -52,8 +63,16 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         marginTop: 10
     },
-    contentContainer: {
-        justifyContent: 'flex-start'
+    textAndFavBtnContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        // alignItems: 'center',
+        // justifyContent: 'space-between',
+        paddingRight: 10
+    },
+    textContainer: {
+        flex: 1,
+        justifyContent: 'flex-start',
     },
     itemPrice: {
         color: colors.red
@@ -63,7 +82,7 @@ const styles = StyleSheet.create({
 function propsAreEqual(
     prevProps: Readonly<ProductItemProps>, nextProps: Readonly<ProductItemProps>
 ) {
-    return prevProps.item.id === nextProps.item.id
+    return prevProps.item.id === nextProps.item.id && prevProps.isFavorite === nextProps.isFavorite
 }
 
 export default React.memo(ProductItem, propsAreEqual)

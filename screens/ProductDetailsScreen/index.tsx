@@ -1,52 +1,81 @@
-import React, { useMemo, useEffect, useCallback, useState } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { StyleSheet, View, Image } from 'react-native'
-import BoldText from '../../components/BoldText'
 
-import ErrorComponent from '../../components/ErrorComponent'
+// Components
+import BoldText from '../../components/BoldText'
 import LazyLoader from '../../components/LazyLoader'
 import RegularText from '../../components/RegularText'
+import ToggleButton from '../../components/ToggleButton'
+import ErrorComponent from '../../components/ErrorComponent'
+
+// Components
 import colors from '../../constants/colors'
+
+// Redux
+import { useAppDispatch, useAppSelector } from '../../hooks'
+import { toggleFav } from '../../store/slices/productSlice'
+
+// Services
 import { useGetProductDetailsByIdQuery } from '../../services/products'
-import { width } from '../../utils/miscUtils'
+
+// Misc
+import { height, width } from '../../utils/miscUtils'
 
 const ProductDetailsScreen = (props: any) => {
-    const { navigation, route } = props
+    const { route } = props
     const { params } = route
     const { prodId } = params
+
+    const dispatch = useAppDispatch()
+
+    const { favProductIds } = useAppSelector((state) => state.products)
 
     const { data, isError, error, isLoading } = useGetProductDetailsByIdQuery({
         product_id: prodId
     })
 
-    useEffect(() => {
-        console.log('data : ', data)
-    }, [data])
+    const toggleFavHandler = useCallback((productId: number) => {
+        dispatch(toggleFav(productId))
+    }, [dispatch])
 
     const productImg = useMemo(() => ({ uri: data?.data?.product_images?.[0]?.image }), [data])
-
-    console.log('productImg : ', productImg)
 
     if (error || isError) {
         return <ErrorComponent />
     }
 
-    if (isLoading) {
+    if (isLoading || !data?.data) {
         return <LazyLoader />
     }
 
     return (
         <View style={styles.container}>
-            {/* <AppLoader isVisible={isLoading} /> */}
             <Image
                 source={productImg}
                 style={styles.productImg}
-                resizeMode="contain"
+                resizeMode="stretch"
             />
-            <BoldText>{data?.data?.name}</BoldText>
-            <RegularText>{data?.data?.producer}</RegularText>
-            <BoldText>{`Rs. ${data?.data?.cost}`}</BoldText>
-            <BoldText>{`Rating ${data?.data?.rating}`}</BoldText>
-            <RegularText>{data?.data?.description}</RegularText>
+            <View style={styles.descriptionContainer}>
+                <View style={styles.basicDetailsContainer}>
+                    <View>
+                        <BoldText>{data?.data?.name}</BoldText>
+                        <RegularText>{data?.data?.producer}</RegularText>
+                    </View>
+                    <ToggleButton
+                        isActive={favProductIds[data?.data?.id]}
+                        onToggle={toggleFavHandler.bind(null, data?.data?.id)}
+                    />
+                </View>
+                <View style={styles.costDataContainer}>
+                    <BoldText style={styles.costText}>
+                        {`Rs. ${data?.data?.cost}`}
+                    </BoldText>
+                    <BoldText style={styles.costText}>
+                        {`Rating ${data?.data?.rating}`}
+                    </BoldText>
+                </View>
+                <RegularText>{data?.data?.description}</RegularText>
+            </View>
         </View>
     )
 }
@@ -56,10 +85,28 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.white
     },
+    descriptionContainer: {
+        marginHorizontal: 10,
+        marginTop: 10
+    },
+    basicDetailsContainer: {
+        marginVertical: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+    costDataContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    costText: {
+        flex: 1,
+        color: colors.red
+    },
     productImg: {
         width,
-        height: 150,
-        marginVertical: 10
+        height: height * 0.35
     }
 })
 
