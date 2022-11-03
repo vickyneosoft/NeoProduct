@@ -10,6 +10,7 @@ export interface Product<ImageType> {
     product_images: ImageType
     created: number
     modified: number
+    responseStatus: "success"
 }
 
 export interface ProductImage {
@@ -24,6 +25,7 @@ export interface ErrorPayload {
     message: string
     status: number
     user_msg: string
+    responseStatus: "failure"
 }
 
 export interface ListResponse<T> {

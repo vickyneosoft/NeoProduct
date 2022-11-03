@@ -145,8 +145,6 @@ export default class FlatListSlider extends Component<FlatListSliderProps, FlatL
                         indicatorActiveColor={this.props.indicatorActiveColor}
                         indicatorInActiveColor={this.props.indicatorInActiveColor}
                         indicatorActiveWidth={this.props.indicatorActiveWidth}
-                        // style={{ ...styles.indicator, ...this.props.indicatorStyle }}
-                        style={this.props.indicatorStyle}
                     />
                 )}
             </View>

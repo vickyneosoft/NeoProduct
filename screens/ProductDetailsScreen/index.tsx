@@ -39,7 +39,7 @@ const ProductDetailsScreen = (props: any) => {
         dispatch(toggleFav(productId))
     }, [dispatch])
 
-    if (error || isError) {
+    if (data?.data.responseStatus === "failure" || error || isError) {
         return <ErrorComponent />
     }
 

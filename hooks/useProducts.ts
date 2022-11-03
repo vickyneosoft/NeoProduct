@@ -1,7 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
+
+// Constants
 import constants from '../constants'
-import { useGetProductsQuery } from '../services/products'
+
+// Types
 import { Product } from '../types'
+
+// Services
+import { useGetProductsQuery } from '../services/products'
 
 function useProducts() {
     const [data, setData] = useState<Product<string>[]>([])
@@ -19,7 +25,6 @@ function useProducts() {
 
     useEffect(function () {
         if (apiData && apiData?.data && Array.isArray(apiData.data)) {
-            console.log('len : ', apiData.data.length)
             if (apiData.data.length < constants.productsLimit) {
                 setEndReached(true)
             } else {

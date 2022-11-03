@@ -5,7 +5,7 @@ import colors from '../constants/colors'
 function LazyLoader() {
     return (
         <View style={styles.container}>
-            <ActivityIndicator size="large" color={colors.white} />
+            <ActivityIndicator size="large" color={colors.purple} />
         </View>
     )
 }
