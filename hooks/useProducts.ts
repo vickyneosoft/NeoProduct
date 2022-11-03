@@ -21,18 +21,31 @@ function useProducts() {
     }), [page])
 
     // Using a query hook automatically fetches data and returns query values
-    const { data: apiData, error, isLoading, isFetching } = useGetProductsQuery(productsConfig)
+    const { data: apiData, error, isLoading } = useGetProductsQuery(productsConfig)
+
+    const [isFetching, setFetching] = useState(false)
 
     useEffect(function () {
-        if (apiData && apiData?.data && Array.isArray(apiData.data)) {
-            if (apiData.data.length < constants.productsLimit) {
-                setEndReached(true)
-            } else {
-                setEndReached(false)
+        try {
+            if (apiData && apiData?.data && Array.isArray(apiData.data)) {
+                if (apiData.data.length < constants.productsLimit) {
+                    setEndReached(true)
+                } else {
+                    setEndReached(false)
+                }
+                setData(prevState => [...prevState, ...<[]>apiData.data])
             }
-            setData(prevState => [...prevState, ...<[]>apiData.data])
+            setFetching(false)
+        } catch (err: any) {
+            setFetching(false)
         }
     }, [apiData])
+
+    useEffect(() => {
+        if (error) {
+            setFetching(false)
+        }
+    }, [error])
 
     const onEndReachedHandler = useCallback(() => {
         if (endReached || isFetching || isLoading) {
@@ -42,6 +55,7 @@ function useProducts() {
     }, [endReached, isFetching, isLoading])
 
     const refresh = useCallback(() => {
+        setFetching(true)
         setData([])
         setPage(1)
     }, [])
