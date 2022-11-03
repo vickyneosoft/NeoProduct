@@ -9,10 +9,11 @@ const ProductSliderImage = ({
     index,
     imageKey,
     local,
-    height
+    height,
 }) => {
     return (
         <FastImage
+            key={item.id}
             style={[styles.image, style, { height: height }]}
             source={local ? item[imageKey] : { uri: item[imageKey] }}
             resizeMode={"stretch"}

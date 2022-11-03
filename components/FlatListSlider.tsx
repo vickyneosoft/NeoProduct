@@ -8,6 +8,7 @@ import {
     Dimensions,
     ViewStyle,
 } from 'react-native';
+import { keyExtractHandler } from '../utils/miscUtils';
 import Indicator from './Indicator';
 import ChildItem from './ProductSliderImage';
 
@@ -24,7 +25,7 @@ type FlatListSliderProps = {
     indicatorStyle: ViewStyle
     indicator: boolean
     loop: boolean
-    currentIndexCallback: (index: number) => any
+    currentIndexCallback?: (index: number) => any
     indicatorContainerStyle: ViewStyle
     indicatorActiveColor: string
     indicatorInActiveColor: string
@@ -70,6 +71,38 @@ export default class FlatListSlider extends Component<FlatListSliderProps, FlatL
         if (Platform.OS === 'android') {
             UIManager.setLayoutAnimationEnabledExperimental(true);
         }
+        this.renderSliderItemHandler = this.renderSliderItemHandler.bind(this)
+        this.getItemLayoutHandler = this.getItemLayoutHandler.bind(this)
+        this.renderItemSeparatorComp = this.renderItemSeparatorComp.bind(this)
+    }
+
+    renderItemSeparatorComp() {
+        return <View style={{ width: this.props.separatorWidth }} />
+    }
+
+    renderSliderItemHandler({ item, index }) {
+        return React.cloneElement(this.props.component, {
+            key: item.id,
+            style: { width: this.props.width },
+            item: item,
+            imageKey: this.props.imageKey,
+            onPress: this.props.onPress,
+            index: this.state.index % this.props.data.length,
+            active: index === this.state.index,
+            local: this.props.local,
+            height: this.props.height,
+        })
+    }
+
+    getItemLayoutHandler(data, index) {
+        const itemWidth = this.props.width;
+        const separatorWidth = this.props.separatorWidth;
+        const totalItemWidth = itemWidth + separatorWidth;
+        return {
+            length: totalItemWidth,
+            offset: totalItemWidth * index,
+            index,
+        }
     }
 
     render() {
@@ -89,29 +122,12 @@ export default class FlatListSlider extends Component<FlatListSliderProps, FlatL
                     contentContainerStyle={this.props.contentContainerStyle}
                     data={this.state.data}
                     showsHorizontalScrollIndicator={false}
-                    renderItem={({ item, index }) =>
-                        React.cloneElement(this.props.component, {
-                            style: { width: this.props.width },
-                            item: item,
-                            imageKey: this.props.imageKey,
-                            onPress: this.props.onPress,
-                            index: this.state.index % this.props.data.length,
-                            active: index === this.state.index,
-                            local: this.props.local,
-                            height: this.props.height,
-                        })
-                    }
-                    ItemSeparatorComponent={() => (
-                        <View style={{ width: this.props.separatorWidth }} />
-                    )}
-                    keyExtractor={(item, index) => item.toString() + index}
+                    renderItem={this.renderSliderItemHandler}
+                    ItemSeparatorComponent={this.renderItemSeparatorComp}
+                    keyExtractor={keyExtractHandler}
                     onViewableItemsChanged={this.onViewableItemsChanged}
                     viewabilityConfig={this.viewabilityConfig}
-                    getItemLayout={(data, index) => ({
-                        length: totalItemWidth,
-                        offset: totalItemWidth * index,
-                        index,
-                    })}
+                    getItemLayout={this.getItemLayoutHandler}
                     windowSize={1}
                     initialNumToRender={1}
                     maxToRenderPerBatch={1}
@@ -129,7 +145,8 @@ export default class FlatListSlider extends Component<FlatListSliderProps, FlatL
                         indicatorActiveColor={this.props.indicatorActiveColor}
                         indicatorInActiveColor={this.props.indicatorInActiveColor}
                         indicatorActiveWidth={this.props.indicatorActiveWidth}
-                        style={{ ...styles.indicator, ...this.props.indicatorStyle }}
+                        // style={{ ...styles.indicator, ...this.props.indicatorStyle }}
+                        style={this.props.indicatorStyle}
                     />
                 )}
             </View>

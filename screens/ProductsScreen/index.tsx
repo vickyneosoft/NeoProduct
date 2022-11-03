@@ -73,7 +73,6 @@ const ProductsScreen = (props: any) => {
     }, [isFavoriteProduct, showProductDetailsHandler, toggleFavProductHandler])
 
     if (error) {
-        console.log('error : ', error)
         return (
             <ErrorComponent />
         )

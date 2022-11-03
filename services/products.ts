@@ -1,7 +1,7 @@
 // Need to use the React-specific entry point to import createApi
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import constants from '../constants'
 import type { ApiResponse, ListResponse, Product, ProductImage } from '../types'
+import constants from '../constants'
 
 // Define a service using a base URL and expected endpoints
 export const productApi = createApi({
@@ -17,15 +17,16 @@ export const productApi = createApi({
                 params
             }),
             providesTags: (result, error, arg) => {
-                console.log('arg : ', arg)
                 return result
                     ? [...result.data.map(({ id }) => ({ type: 'Post' as const, id })), 'Post']
                     : ['Post']
             },
             transformResponse(baseQueryReturnValue: ListResponse<Product<string>>, meta, arg) {
+                if (!meta?.response?.ok) {
+                    console.log('JSON Error : ', meta?.response)
+                }
                 return baseQueryReturnValue
             },
-
         }),
         getProductDetailsById: builder.query<ApiResponse<Product<ProductImage[]>>, any>({
             query: (params) => ({
@@ -33,6 +34,9 @@ export const productApi = createApi({
                 params
             }),
             transformResponse(baseQueryReturnValue: ApiResponse<Product<ProductImage[]>>, meta, arg) {
+                if (!meta?.response?.ok) {
+                    console.log('JSON Error : ', meta?.response)
+                }
                 return baseQueryReturnValue
             },
         })

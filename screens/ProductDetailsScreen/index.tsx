@@ -1,6 +1,5 @@
-import React, { useMemo, useCallback } from 'react'
-import { StyleSheet, View, Image } from 'react-native'
-import FastImage from 'react-native-fast-image'
+import React, { useCallback } from 'react'
+import { StyleSheet, View } from 'react-native'
 
 // Components
 import BoldText from '../../components/BoldText'
@@ -40,10 +39,7 @@ const ProductDetailsScreen = (props: any) => {
         dispatch(toggleFav(productId))
     }, [dispatch])
 
-    const productImg = useMemo(() => ({ uri: data?.data?.product_images?.[0]?.image }), [data])
-
     if (error || isError) {
-        console.log('[ProductDetailsScreen] Error : ', error)
         return <ErrorComponent />
     }
 
@@ -53,24 +49,13 @@ const ProductDetailsScreen = (props: any) => {
 
     return (
         <View style={styles.container}>
-            {/* <Image
-                source={productImg}
-                style={styles.productImg}
-                resizeMode="stretch"
-            /> */}
             <FlatListSlider
                 data={data?.data?.product_images}
-                timer={2000}
                 imageKey={'image'}
                 local={false}
                 width={width}
-                separator={0}
                 loop={false}
-                autoscroll={false}
-                currentIndexCallback={index => console.log('Index', index)}
-                onPress={item => alert(JSON.stringify(item))}
                 indicator
-            // animation
             />
             <View style={styles.descriptionContainer}>
                 <View style={styles.basicDetailsContainer}>
